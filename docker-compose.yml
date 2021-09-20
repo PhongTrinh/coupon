@@ -1,0 +1,46 @@
+version: "3"
+services:
+  web:
+    depends_on:
+      - db
+      - redis
+    restart: always
+    build:
+      context: .
+      dockerfile: ./containers/web/Dockerfile
+    ports:
+      - 9000:9000
+    environment:
+      - DB_URL=mongodb://admin:123convitbau@db_mongo
+      - PORT=9000
+    volumes:
+      - ./back_end/src:/back_end/src
+      - ./back_end/files:/back_end/files
+    networks:
+      - network
+
+  db:
+    image: mongo:5
+    container_name: db_mongo
+    volumes:
+      - mongodata:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=123convitbau
+    ports:
+      - "27017:27017"
+    networks:
+      - network
+
+  redis:
+    image: redis
+    networks:
+      - network
+  
+volumes:
+  mongodata:
+
+networks:
+  network:
+    driver: bridge
+    
